@@ -1,0 +1,134 @@
+button {
+  cursor: pointer;
+}
+
+.container {
+  width: 100%;
+  height: 100%;
+}
+
+#container-ready {
+  background-color: #338361;
+}
+
+#container-ready .title-wrapper {
+  height: 60%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #000;
+}
+
+#container-ready .title-wrapper h1 {
+  color: #fff;
+  border: 2px solid;
+  padding: 25px;
+}
+
+#container-ready .start-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#container-ready .start-wrapper #startBtn {
+  font-size: 30px;
+  width: 50%;
+}
+
+#container-main {
+  display: none;
+  background-color: #116e83;
+  color: #fff;
+}
+
+#container-main .container {
+  padding: 50px 0;
+}
+
+#container-main #funds {
+  display: inline;
+}
+
+#container-main #face-wrapper {
+  height: 45%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#container-main #face-wrapper .face {
+  width: 100px;
+  height: 150px;
+  margin: 10px;
+  border: 1px solid #eee;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+#container-main #face-wrapper .face h1,
+#container-main #face-wrapper .face span {
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none;
+}
+
+#container-main .winnings-wapper {
+  width: 100%;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+#container-main .winnings-wapper #winnings {
+  font-weight: bold;
+  margin: 0 10px;
+}
+
+#container-main #totalBet {
+  display: inline;
+}
+
+#container-main #dice-wrapper {
+  height: 15%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#container-main #dice-wrapper .dice {
+  width: 80px;
+  height: 80px;
+  margin: 10px;
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#container-main #dice-wrapper .dice h1 {
+  margin: 0;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  user-drag: none;
+  -webkit-touch-callout: none;
+}
+
+#container-main #round {
+  display: inline;
+}
+
+#container-main .betting-wrapper {
+  margin: 100px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
