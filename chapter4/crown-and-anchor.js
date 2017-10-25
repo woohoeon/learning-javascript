@@ -2,7 +2,7 @@
  * crown-and-anchor.js
  * 크라운 앤 앵커 게임
  * 
- * extract code from a learn javascirpt book
+ * extract code from a learning javascirpt book
  * 소스코드는 러닝자바스크립트 책의 내용을 참조하였습니다.
  */
 
