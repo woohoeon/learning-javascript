@@ -61,6 +61,7 @@ button {
   width: 100px;
   height: 150px;
   margin: 10px;
+  color: #000;
   border: 1px solid #eee;
   display: flex;
   align-items: center;
@@ -105,6 +106,7 @@ button {
   width: 80px;
   height: 80px;
   margin: 10px;
+  color: #000;
   background-color: #fff;
   display: flex;
   align-items: center;
