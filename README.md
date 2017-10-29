@@ -42,3 +42,21 @@ Example of learning javascript book
 * 해체 할당
 
 * 템플릿 문자열의 표현식
+
+## Chapter6
+
+#### 함수
+
+* 매개변수 해체
+
+* 매개변수 기본값
+
+* 객체의 프로퍼티인 함수
+
+* this 키워드
+
+* 함수 표현식과 익명 함수
+
+* 화살표 표기법
+
+* call과 apply, bind
