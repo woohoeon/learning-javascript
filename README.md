@@ -60,3 +60,5 @@ Example of learning javascript book
 * 화살표 표기법
 
 * call과 apply, bind
+
+## Chapter7
