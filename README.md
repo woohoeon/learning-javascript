@@ -62,3 +62,17 @@ Example of learning javascript book
 * call과 apply, bind
 
 ## Chapter7
+
+#### 스코프
+
+* 블록 스코프
+
+* 변수 숨기기
+
+* 클로저
+
+* 즉시 호출하는 함수 표현식
+
+* 함수 스코프와 호이스팅
+
+* 함수 호이스팅
