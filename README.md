@@ -76,3 +76,11 @@ Example of learning javascript book
 * 함수 스코프와 호이스팅
 
 * 함수 호이스팅
+
+## Chapter8
+
+#### 배열 
+
+* 배열 요소 조작
+
+
