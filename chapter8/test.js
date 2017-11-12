@@ -134,4 +134,83 @@
     arr12.find((x, i) => i > 2 && Number.isInteger(Math.sqrt(x)));
     console.log(arr12.find((x, i) => i > 2 && Number.isInteger(Math.sqrt(x))));
 
+    // find와 findIndex에 전달 하는 함수의 this도 수정할 수 있습니다.
+    class Person {
+        constructor(name) {
+            this.name = name;
+            this.id = Person.nextId++;
+        }
+    }
+    Person.nextId = 0;
+
+    const jamie = new Person('Jamie'),
+        juliet = new Person('Juliet'),
+        peter = new Person('Peter'),
+        jay = new Person('Jay');
+
+    const arr13 = [jamie, juliet, peter, jay];
+
+    // 옵션 1: ID를 직접 비교하는 방법
+    arr13.find(p => p.id === juliet.id);
+    console.log(arr13.find(p => p.id === juliet.id));
+
+    // 옵션 2: 'this' 매개변수를 이용하는 방법
+    arr13.find(function (p) {
+        return p.id === this.id;
+    }, juliet);
+    console.log(arr13.find(function (p) {
+        return p.id === this.id;
+    }, juliet));
+
+    // 간혹 조건을 만족하는 요소의 인덱스도, 요소 자체도 필요 없고, 조건을 만족하는 요소가 있는지 없는지만 알면 충분할 때가 있습니다.
+    // 이럴 때 쓰라고 만든 some과 every 메서드가 있습니다.
+    // some은 조건에 맞는 요소를 찾으면 즉시 검색을 멈추고 true를 반환하며, 찾지 못하면 false를 반환합니다.
+    const arr14 = [5, 7, 12, 15, 17];
+    arr14.some(x => x % 2 === 0); // ture;
+    console.log(arr14.some(x => x % 2 === 0));
+    arr14.some(x => Number.isInteger(Math.sqrt(x)));
+    console.log(arr14.some(x => Number.isInteger(Math.sqrt(x))));
+
+    // every는 배열의 모든 요소가 조건에 맞아야 true를 반환하며 그렇지 않다면 false를 반환합니다.
+    // every는 조건에 맞지 않는 요소를 찾아야만 검색을 멈추고 false를 반환합니다. 조건에 맞지않는 요소를 찾아내지 못하면 배열 전체를 검색합니다.
+    const arr15 = [4, 6, 16, 36];
+    arr15.every(x => x % 2 === 0);
+    console.log(arr15.every(x => x % 2 === 0));
+    arr15.every(x => Number.isInteger(Math.sqrt(x)));
+    console.log(arr15.every(x => Number.isInteger(Math.sqrt(x))));
+
+    /**
+     * map과 filter
+     */
+    // 일정한 형식의 배열을 다른 형식으로 바꿔야 한다면 map을 쓰십시오.
+    // map과 filter는 모두 사본을 반환하며 원래 배열은 바뀌지 않습니다.
+    const cart = [{ name: 'Widget', price: 9.95 }, { name: 'Gadget', price: 22.95 }];
+
+    const names = cart.map(x => x.name);
+    console.log(names);
+
+    const prices = cart.map(x => x.price);
+    console.log(prices);
+
+    const discountPrices = prices.map(x => x * 0.8);
+    console.log(discountPrices);
+
+    // 콜백 함수는 각 요소에서 호출될 때 요소 자체와 요소 인덱스, 배열 전체를 매개변수로 받습니다.
+    // 두 배열의 상품과 가격에 따로 저장되어 있는데, 이 둘을 객체로 결합해 봅시다.
+    const items = ['Widget', 'Gadget'];
+    const prices2 = [9.95, 22.95];
+    const cart2 = items.map((x, i) => ({ name: x, price: prices2[i] })); // ()로 감싸서 객체 리터럴의 중괄호를 블록으로 판단하지 않게 합니다.
+    console.log(cart2);
+
+    // filter는 배열에서 필요한 것들만 남깁니다.
+    const cards = [];
+    for (let suit of ['H', 'C', 'D', 'S'])
+        for (let value = 1; value <= 13; value++)
+            cards.push({ suit, value });
+
+    console.log(cards);
+
+    cards.filter(c => c.value === 2);
+    console.log(cards.filter(c => c.value === 2));
+
 })();
