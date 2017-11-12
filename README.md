@@ -83,4 +83,6 @@ Example of learning javascript book
 
 * 배열 요소 조작
 
+* 배열 검색
 
+* map과 filter
