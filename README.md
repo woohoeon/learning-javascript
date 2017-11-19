@@ -86,3 +86,11 @@ Example of learning javascript book
 * 배열 검색
 
 * map과 filter
+
+* reduce
+
+* 삭제되거나 정의되지 않은 요소들
+
+* 문자열 병합
+
+* 요약
