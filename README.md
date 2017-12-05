@@ -94,3 +94,19 @@ Example of learning javascript book
 * 문자열 병합
 
 * 요약
+
+## Chapter9
+
+#### 객체와 객체지향 프로그래밍
+
+* 프로 퍼티 나열
+
+	* for...in 
+	* Object.keys
+
+* 객체지향 프로그래밍
+
+	* 클래스와 인스턴스 생성
+	* 클래스는 함수다
+	* 프로토타입
+	* 정적 메서드
