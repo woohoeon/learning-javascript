@@ -253,7 +253,7 @@
             car1.shift('d');
             console.log(car1.userGear); // 'D'
             console.log(car1.shift);
-            
+
             // 이 예제는 동적 디스패치를 어떻게 구현하지는 잘 보여줍니다. car1 객체에는 shift 메서드가 없지만, 
             // car1.shift('D')를 호출하면 자바스크립트는 car1의 프로토타입에서 그런 이름의 메서드를 검색합니다. 
             // car1에 shift 메서드를 추가하면 car1과 프로토타입에 같은 이름의 메서드가 존재하게 됩니다.
@@ -262,7 +262,60 @@
 
         /**
          * 정적 메서드
+         * 
+         * 메서드에는 인스턴스 메서드 외에도 정적 메서드(클래스 메서드)가 있습니다.
+         * 일반적으로 정적 메서드에는 this 대신 클래스 이름을 사용하는 것이 좋은 습관입니다.
+         * 정적 메서드는 클래스에 관련되지만 인스턴스와는 관련이 없는 범용적인 작업에 사용됩니다.
+         * 예제로 자동차 식별 번호(VIN)을 붙이는 메서드를 생각해 봅시다.
+         * VIN을 할당한다는 것은 자동차 전체를 대상으로 하는 추상적인 개념이므로 정적 메서드로 사용하는 게 어울립니다.
          */
+        {
+            // 예를 들어 두 자동차의 제조사와 모델이 모두 같으면 true를 반환하는 areSimilar 메서드, 
+            // 두 자동차의 VIN이 같으면 true를 반환하는 areSame 메서드를 만들어 봅시다.
+            class Car {
+                static getNextVin() {
+                    return Car.nextVin++; // this.nextVin++라고 써도 되지만, Car를 앞에 쓰면 정적 메서드라는 점을 상기하기 쉽습니다.
+                }
+                constructor(make, model) {
+                    this.make = make;
+                    this.model = model;
+                    this.vin = Car.getNextVin();
+                }
+                static areSimilar(car1, car2) {
+                    return car1.make === car2.make && car1.model === car2.model;
+                }
+                static areSame(car1, car2) {
+                    return car1.vin === car2.vin;
+                }
+            }
+            Car.nextVin = 0;
+
+            const car1 = new Car('Tesla', 'S');
+            const car2 = new Car('Mazda', '3');
+            const car3 = new Car('Mazda', '3');
+
+            console.log(car1.vin); // 0
+            console.log(car2.vin); // 1
+            console.log(car3.vin); // 2
+
+            console.log(Car.areSimilar(car1, car2)); // false
+            console.log(Car.areSimilar(car2, car3)); // ture
+            console.log(Car.areSame(car2, car3)); // false
+            console.log(Car.areSame(car2, car2)); // true
+        }
+
+        /**
+         * 상속
+         * 
+         * 클래스의 인스턴스는 클래스의 기능을 모두 상속합니다.
+         * 자바스크립트는 조건에 맞는 프로토타입을 찾을 때까지 프로토타입 체인을 계속 거슬러 올라갑니다.
+         * 조건에 맞는 프로토타입을 찾지 못하면 에러를 일으킵니다.
+         * 클래스의 계층 구조를 만들 때 프로토타입 체인을 염두에 두면 효율적인 구조를 만들 수 있습니다.
+         * 즉, 프로토타입 체인에서 가장 적절한 위치에 메서드를 정의하는 겁니다.
+         */
+        {
+
+        }
     }
 
 })();
