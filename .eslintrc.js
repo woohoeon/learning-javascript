@@ -4,7 +4,6 @@ module.exports = {
         "node": true,
         "jquery": true
     },
-    "extends": "eslint:recommended",
     "parserOptions": {
         "sourceType": "module"
     },
