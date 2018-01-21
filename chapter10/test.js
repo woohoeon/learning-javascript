@@ -129,7 +129,7 @@
                     getSecret() {
                         return secrets.get(this);
                     }
-                }
+                };
             })();
 
             // 앞의 예제에서는 WeakMap과 그 위크맵을 사용하는 클래스를 함께 IIFE에 넣었습니다.
