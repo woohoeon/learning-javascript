@@ -130,3 +130,19 @@ Example of learning javascript book
 * 위크셋
 
 * 요약
+
+## Chapter11
+
+#### 예외와 에러처리
+
+* Error 객체
+
+* try/catch와 예외처리
+
+* 에러 일으키기
+
+* 예외 처리와 호출 스택
+
+* try...catch...finally
+
+* 요약
