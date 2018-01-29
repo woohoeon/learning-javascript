@@ -137,7 +137,7 @@
                                 return { value: undefined, done: true };
                             return { value: messages[i++], done: false };
                         }
-                    }
+                    };
                 }
             }
 
@@ -167,7 +167,7 @@
                             a = rval.value;
                             return rval;
                         }
-                    }
+                    };
                 }
             }
 
