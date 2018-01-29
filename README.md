@@ -146,3 +146,18 @@ Example of learning javascript book
 * try...catch...finally
 
 * 요약
+
+## Chapter12
+
+#### 이터레이터와 제너레이터
+
+* 이터레이터 개념
+
+* 이터레이션 프로토콜
+
+* 제너레이터
+
+	* yield 표현식과 양방향 통신
+	* 제너레이터와 return
+
+* 요약
