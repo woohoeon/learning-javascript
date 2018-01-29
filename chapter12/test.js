@@ -241,7 +241,57 @@
                 const color = yield 'What is your favorite color?';
                 return `${name}'s favorite color is ${color}.`;
             }
+
+            // 이 제너레이터를 호출하면 이터레이터를 얻습니다. 그리고 제너레이터의 어떤 부분도 아직 실행하지 않은 상태입니다. next를 호출하면 제너레이터는
+            // 첫 번째 행을 실행하려 합니다. 하지만 그 행에는 yield 표현식이 들어 있으므로 제너레이터는 반드시 제어권을 호출자에게 넘겨야 합니다. 제너레이터의
+            // 첫 번째 행이 완료(resolve)되려면 호출자가 next를 다시 호출해야 합니다. 그러면 name은 next에서 전달하는 값을 받습니다.
+            const it = interrogate();
+            console.log(it.next()); // {done: false, value: "What is your name?"}
+            console.log(it.next('Ethan')); // {done: false, value: "What is your favorite color?"}
+            console.log(it.next('orange')); // {done: true, value: "Ethan's favorite color is orange."}
+
+            // 이 예제를 보면 제너레이터를 활용하면 호출자의 함수의 실행을 제어할 수 있어서 아주 유용하게 쓸 수 있다는 걸 알았을 겁니다.
+            // 호출자가 제너레이터에 정보를 전달하므로, 제너레이터는 그 정보에 따라 자신의 동작 방식 자체를 바꿀 수 있습니다.
+            // NOTE_ 제너레이터는 화살표 표기법으로 만들 수 없으며 반드시 function*을 써야합니다.
+        }
+
+        /**
+         * 제너레이터와 return
+         * 
+         * yield 문은, 설령 제너레이터의 마지막 문이더라도 제너레이터를 끝내지 않습니다. 제너레이터에서 return 문을 사용하면 그 위치와 관계없이 done은
+         * true가 되고, value 프로퍼티는 return이 반환하는 값이 됩니다. 다음 예제를 보십시오.
+         */
+        {
+            function* abc() {
+                yield 'a';
+                yield 'b';
+                return 'c';
+            }
+
+            const it = abc();
+            console.log(it.next()); // {done: false, value: "a"}
+            console.log(it.next()); // {done: false, value: "b"}
+            console.log(it.next()); // {done: true, value: "c"}
+
+            // 이런 동작 방식이 정확하기는 하지만, 제너레이터를 사용할 때는 보통 done이 true이면 value프로퍼티에 주의를 기울이지 않는다는 잠을 염두에 두십시오.
+            //  예를 들어 이 제너레이터를 for...of 루프에서 사용하면 c는 절대 출력되지 않습니다.
+
+            for (let l of abc()) {
+                console.log(l);
+            }
+
+            // CAUTION_ 제너레이터에서 중요한 값을 return으로 반환하려 하지 마십시오. return은 제너레이터를 중간에 종료하는 목적으로만 사용해야 합니다.
         }
     }
+
+    /**
+     * 요약
+     * 
+     * 이터레이터는 배열이나 객체처럼 여러 가지 값을 제공할 수 있는 컬렉션의 동작 방식을 표준화했습니다. 이터레이터로 할 수 있는 일은 ES6 이전에도 모두 할 수
+     * 있었으므로, 어떤 기능이 추가된 것은 아닙니다. 중요하면서도 자주 사용하는 패턴을 표준화했다는 데 의미가 있는 겁니다.
+     * 
+     * 제너리이터를 사용하면 함수를 훨씬 더 유연하고 효율적으로 사용할 수 있습니다. 이제 함수를 호출하는 부분에서 데이터를 제공하고, 호출한 함수가 완료되길
+     * 기다렸다가 반환값을 받는다는 사고방식에 얽매일 필요가 없습니다. 제너레이터는 모든 연산을 지연시켰다가 필요할 때만 수행하게 만들 수 있습니다.
+     */
 
 })();
