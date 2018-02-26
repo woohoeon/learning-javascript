@@ -161,3 +161,27 @@ Example of learning javascript book
 	* 제너레이터와 return
 
 * 요약
+
+## Chapter13
+
+#### [함수와 추상적 사고](https://github.com/woohoeon/learning-javascript/blob/master/chapter13/test.js)
+
+* 서브루틴으로서의 함수
+
+* 값을 반환하는 서브루틴으로서의 함수
+
+* 함수로서의 함수
+
+* 그래서?
+	* 함수도 객체다
+
+* IIFE와 비동기적 코드
+
+* 변수로서의 함수
+	* 배열 안의 함수
+	* 함수에 함수 전달
+	* 함수를 반환하는 함수
+
+* 재귀
+
+* 요약
