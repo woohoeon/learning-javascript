@@ -56,12 +56,122 @@
      */
     {
         console.log('Before timeout: ' + new Date());
-        function f() {
+        const f = () => {
             console.log('After timeout: ' + new Date());
-        }
+        };
         setTimeout(f, 60 * 1000);
         console.log('I happen after setTimeout!');
         console.log('Me too!');
+
+        // 이 예제에서는 명확하게 표현하기 위해 이름 붙은 함수 f를 seTimeout에 넘겼습니다. 이름붙은 함수를 써야 하는 타당한
+        // 이유가 없다면, 일반적으로는 다음과 같이 익명 함수를 사용합니다.
+        setTimeout(() => {
+            console.log('After timeout: ' + new Date());
+        }, 60 * 1000);
+
+        /**
+         * setInterval과 clearInterval
+         * 
+         * setTimeout은 콜백 함수를 한 번만 실행하고 멈추지만, setInterval은 콜백을 정해진 주기마다 호출하여 clearInterval
+         * 을 사용할 때까지 멈추지 않습니다. 다음 예제는 분이 넘어가거나 10회째가 될 때까지 5초마다 콜백을 실행합니다.
+         */
+        {
+            const start = new Date();
+            let i = 0;
+            const intervalId = setInterval(() => {
+                let now = new Date();
+                if (now.getMinutes() !== start.getMinutes() || ++i > 10)
+                    return clearInterval(intervalId);
+                console.log(`${i}: ${now}`);
+            }, 5 * 1000);
+
+            // 이 예제를 보면 setInterval이 ID를 반환한다는 사실을 알 수 있습니다. 이 ID를 써서 실행을 멈출 수 있습니다.
+            // NOTE_ setTimeout, setInterval, clearInterval은 모두 전역 객체(브라우저에서는 window, 노드에서는
+            // global)에 정의되어 있습니다.
+        }
+
+        /**
+         * 스코프와 비동기적 실행
+         * 
+         * 비동기적 실행에서 혼란스럽고 에러도 자주 일어나는 부분은 스코프와 클로저가 비동기적 실행에 영향을 미치는 부분
+         * 입니다. 함수를 호출하면 항상 클로저가 만들어집니다. 매개변수를 포함해 함수 안에서 만든 변수는 모두 무언가가 자신에
+         * 접근할 수 있는 한 계속 존재합니다.
+         * 
+         * 이 예제는 이미 봤었지만, 중요한 사실을 배울 수 있으니 반복해서 볼 가치가 있습니다.
+         */
+        {
+            const countdown = () => {
+                let i; // i를 루프 밖에서 선언했습니다.
+                console.log('Countdown');
+                for (i = 5; i >= 0; i--) {
+                    setTimeout(() => {
+                        console.log(i === 0 ? 'Go!' : i);
+                    }, (5 - i) * 1000);
+                }
+            };
+            countdown();
+
+            // 코드를 보면 5에서부터 카운트다운 할 것처럼 보입니다. 하지만 결과는 -1이 여섯 번 반복될 뿐이고, Go!는 나타나지
+            // 않습니다. 이번에는 let을 사용하긴 했지만, 변수를 for루프 밖에서 선언했으므로 같은 문제가 벌어집니다.
+
+            // 스코프와 비동기적 실행이 어떻게 연관되는지 이해하는 것이 중요합니다. countdown을 호출하면 변수 i가 들어있는
+            // 클로저가 만들어집니다. for 루프 안에서 만드는 콜백은 모두 i에 접근 할 수 있고, 그들이 접근하는 i는 똑같은 i입니다.
+
+            const countdown2 = () => {
+                console.log('Countdown');
+                for (let i = 5; i >= 0; i--) {
+                    setTimeout(() => {
+                        console.log(i === 0 ? 'Go!' : i);
+                    }, (5 - i) * 1000);
+                }
+            };
+            countdown2();
+
+            // 여기서 주의할 부분은 콜백이 어느 스코프에 선언됐느냐입니다. 콜백은 자신을 선언한 스코프(클로저)에 있는 것에 접근
+            // 할 수 있습니다. 따라서 i의 값은 콜백이 실제 실행되는 순간마다 다를 수 있습니다. 이 원칙은 콜백뿐만 아니라 모든
+            // 비동기적 테크닉에 적용됩니다.
+        }
+
+        /**
+         * 오류 우선 콜백
+         * 
+         * 노드가 점점 인기를 얻어가던 시기에 오류 우선 콜백(error-first callback)이라는 패턴이 생겼습니다. 콜백을 사용하면
+         * 예외 처리가 어려워지므로, 콜백과 관련된 에러를 처리할 방법의 표준이 필요했습니다. 이에 따라 나타난 패턴이 콜백의 첫
+         * 번째 매개변수에 에러 객체를 쓰자는 것이었습니다. 에러가 null 이나 undefined이면 에러가 없는 것입니다.
+         * 
+         * 오류 우선 콜백을 다룰 때 가정 먼저 생각할 것은 에러 매게변수를 체크하고 그에 맞게 반응하는 겁니다. 노드에서 파일 콘
+         * 텐츠를 읽는다고 할 때, 오류 우선 콜백을 사용한다면 다음과 같은 코드를 쓰게 됩니다.
+         */
+        {
+            const fs = require('fs');
+
+            const fname = 'may_or_may_not_exist.txt';
+            fs.reaFile(fname, function (err, data) {
+                if (err) return console.error(`error reading file ${fname}: ${err.message}`);
+                console.log(`${fname} contents: ${data}`);
+            });
+
+            // 에러 객체를 체크해야 한다는 사실을 기억하고, 아마 로그를 남기기도 하겠지만, 빠져나와야 한다는 사실은 잊는 사람이
+            // 많습니다. 프라미스를 사용하지 않으면 오류 우선 콜백은 노드 개발의 표준이나 다름없습니다. 콜백을 사용하는 인터페이
+            // 스를 만들 때는 오류 우선 콜백을 사용하길 강력히 권합니다.
+        }
+
+        /**
+         * 콜백 헬
+         * 
+         * 콜백을 사용해 비동기적으로 실행할 수 있긴 하지만, 현실적인 단점이 있습니다. 한 번에 여러가지를 기다려야 한다면 콜백을
+         * 관리하기가 상당히 어려워집니다.
+         */
+        {
+
+        }
+    }
+
+    /**
+     * 프라미스
+     */
+    {
+
     }
 
 })();
