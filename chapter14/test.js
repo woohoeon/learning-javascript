@@ -143,13 +143,12 @@
          * 텐츠를 읽는다고 할 때, 오류 우선 콜백을 사용한다면 다음과 같은 코드를 쓰게 됩니다.
          */
         {
-            const fs = require('fs');
-
-            const fname = 'may_or_may_not_exist.txt';
-            fs.reaFile(fname, function (err, data) {
-                if (err) return console.error(`error reading file ${fname}: ${err.message}`);
-                console.log(`${fname} contents: ${data}`);
-            });
+            // const fs = require('fs');
+            // const fname = 'may_or_may_not_exist.txt';
+            // fs.reaFile(fname, function (err, data) {
+            //     if (err) return console.error(`error reading file ${fname}: ${err.message}`);
+            //     console.log(`${fname} contents: ${data}`);
+            // });
 
             // 에러 객체를 체크해야 한다는 사실을 기억하고, 아마 로그를 남기기도 하겠지만, 빠져나와야 한다는 사실은 잊는 사람이
             // 많습니다. 프라미스를 사용하지 않으면 오류 우선 콜백은 노드 개발의 표준이나 다름없습니다. 콜백을 사용하는 인터페이
@@ -160,18 +159,124 @@
          * 콜백 헬
          * 
          * 콜백을 사용해 비동기적으로 실행할 수 있긴 하지만, 현실적인 단점이 있습니다. 한 번에 여러가지를 기다려야 한다면 콜백을
-         * 관리하기가 상당히 어려워집니다.
+         * 관리하기가 상당히 어려워집니다. 더 골치 아픈 문제는 에러 처리 입니다. 이 예제에서는 에러를 기록하기만 했지만, 예외를
+         * 일으키려 했다면 더더욱 골치가 아팠을 겁니다. 다음 예제를 보십시오.
          */
         {
+            // const fs = require('fs');
+            // const readSketchyFile = () => {
+            //     try {
+            //         fs.readFile('does_not_exist.txt', function (err, data) {
+            //             if (err) throw err;
+            //         });
+            //     } catch (err) {
+            //         console.log('warning: minor issue occurred, program continuing');
+            //     }
+            // };
 
+            // 이 코드는 얼핏 타당해 보이고, 예외 처리도 수행하는 방어적인 코드처럼 보입니다. 동작하지 않는다는 것만 빼면 말입니다.
+            // 예외 처리가 의도대로 동작하지 않는 이유는 try...catch 블록은 같은 함수 안에서만 동작하기 때문입니다. try...catch
+            // 블록은 readSketchyFile 함수 안에 있지만, 정작 예외는 fs.readFile이 콜백으로 호출하는 익명 함수 안에서 일어났
+            // 습니다.
+            // 또한, 콜백이 우연히 두 번 호출되거나, 아예 호출되지 않는 경우를 방지하는 안전장치도 없습니다.
+            // 이런 문제가 해결할 수 없는 문제는 아닙니다. 하지만 비동기적 코드가 늘어나면 늘어날수록 버그가 없고 관리하기 쉬운 코
+            // 드를 작성하기는 매우 어려워집니다. 그래서 프라미스가 등장했습니다.
         }
     }
 
     /**
      * 프라미스
+     * 
+     * 프라미스는 콜백의 단점을 해결하는 시도 속에서 만들어졌습니다. 프라미스는 간혹 번거롭게 느껴질 수 있지만, 일반적으로 안전
+     * 하고 관리하기 쉬운 코드를 만들 수 있게 됩니다.
+     * 
+     * 프라미스가 콜백을 대체하는 것은 아입니다. 사실 프라미스에서도 콜백을 사용합니다. 프라미스는 콜백을 예측 가능한 패턴으로
+     * 사용할 수 있게 하며, 프라미스 없이 콜백만 사용했을 때 나타날 수 있는 엉뚱한 현상이나 찾기 힘든 버그를 상당수 해결합니다.
+     * 
+     * 프라미스의 기본 개념은 간단합니다. 프라미스 기반 비동기적 함수를 호출하면 그 함수는 Promise 인스턴스를 반환합니다. 프라
+     * 미스는 성공(fulfilled)하거나, 실패(rejected)하거나 단 두 가지뿐 입니다. 프라미스는 성공 혹은 실패 둘 중 하나만 일어난다고
+     * 확신할 수 있습니다. 성공한 프라미스가 나중에 실패하는 일 같은 건 절대 없습니다. 또한, 성공이든 실패든 단 한 번만 일어납니다.
+     * 프라미스가 성공하거나 실패하면 그 프라미스를 결정됐다(settled)고 합니다.
+     * 
+     * 프라미스는 객체이므로 어디든 전달할 수 있다는 점도 콜백에 비해 간편한 장점입니다. 비동기적 처리를 여기서 하지 않고 다른 함
+     * 수에서 (또는 다른 동료가) 처리하게 하고 싶다면 프라미스를 넘기기만 하면 됩니다. 마치 음식점에서 받은 예약 호출기를 친구에
+     * 게 맡기는 것과 비슷합니다. 예약한 인원이 때맞춰 오기만 한다면, 음식점에서는 누가 호출기를 들고 있든 상관없으니까요.
      */
     {
+        /**
+         * 프라미스 만들기
+         * 
+         * 프라미스는 쉽게 만들 수 있습니다. resolve (성공)와 reject (실패) 콜백이 있는 함수로 새 Promise 인스턴스를 만들기만
+         * 하면 됩니다. countdown 함수를 고쳐 봅시다. 매개변수를 받게 만들어서 5초 카운트다운에 매이지 않고, 카운트다운이 끝나
+         * 면 프라미스를 반환하게 하겠습니다.
+         */
+        {
+            const countdown = seconds => {
+                return new Promise(function (resolve, reject) {
+                    for (let i = seconds; i >= 0; i--) {
+                        setTimeout(function () {
+                            if (i > 0) console.log(i + '...');
+                            else resolve(console.log('GO!'));
+                        }, (seconds - i) * 1000);
+                    }
+                });
+            };
 
+            // 이대로라면 별로 좋은 함수는 아닙니다. 너무 장황한 데다가, 콘솔을 아예 쓰지 않기를 원할 수도 있습니다. 웹페이지에서 카
+            // 운트다운이 끝나면 페이지 요소를 업데이트하는 목적에 쓰기도 별로 알맞지 않아 보입니다. 하지만 이제 시작일 뿐이고, 프라
+            // 미스를 어떻게 만드는지는 잘 드러나 있습니다. resolve와 reject는 함수입니다. resolve를 여러번 호출하면 프라미스의
+            // 프라미스 같은 걸 만들 수 있지 않을까 하는 생각이 들 수도 있겠지만, resolve나 reject를 여러번 호출하든, 섞어서 호출
+            // 하든 결과는 같습니다. 첫 번째로 호출한 것만 의미가 있습니다. 프라미스는 성공 또는 실패를 나타낼 뿐입니다. 
+        }
+
+        /**
+         * 프라미스 사용
+         * 
+         * countdown 함수를 어떻게 사용하는지 알아봅시다. 프라미스는 무시해버리고 countdown(5) 처럼 호출해도 됩니다. 카운트
+         * 다운은 여전히 동작하고, 무슨 말인지 알기 어려운 프라미스는 신경쓰지 않아도 됩니다. 하지만 프라미스의 장점을 이용하고 싶
+         * 다면 어떻게 해야 할까요? 반환된 프라미스를 사용하는 예제를 살펴봅시다.
+         */
+        {
+            const countdown = seconds => {
+                return new Promise(function (resolve, reject) {
+                    for (let i = seconds; i >= 0; i--) {
+                        setTimeout(function () {
+                            if (i === 13) return reject(new Error('Oh my god'));
+                            if (i > 0) console.log(i + '...');
+                            else resolve(console.log('GO!'));
+                        }, (seconds - i) * 1000);
+                    }
+                });
+            };
+
+            countdown(5).then(
+                function () {
+                    console.log('countdown completed successfully');
+                },
+                function (err) {
+                    console.log('countdown experienced an error: ' + err.message);
+                }
+            );
+
+            // 이 예제에서는 반환된 프라미스를 변수에 할당하지 않고 then 핸들러를 바로 호출 했습니다. then 핸들러는 성공 콜백과
+            // 에러 콜백을 받습니다. 경우의 수는 단 두 가지뿐입니다. 성공 콜백이 실행되거나, 에러 콜백이 실행되거나 입니다. 프라미
+            // 스는 catch 핸들러도 지원하므로 핸들러를 둘로 나눠서 써도 됩니다.
+
+            const p = countdown(14);
+            p.then(function () {
+                console.log('countdown completed successfully');
+            });
+            p.catch(function (err) {
+                console.log('countdown experienced an error: ' + err.message);
+            });
+
+            // countdown 함수를 수정해서 에러가 일어나게 만들어 봅시다. 13은 불길한 숫자이니 카운트 다운을 하다가 13을 만나
+            // 면 에러를 내는 겁니다. 
+
+            // 13이상의 숫자를 사용하면 13에서 에러가 일어납니다. 하지만 콘솔에는 12부터 다시 카운트를 기록합니다. reject나
+            // resolve가 함수를 멈추지는 않습니다. 이들은 그저 프라미스의 상태를 관리할 뿐입니다.
+        }
+        
     }
 
 })();
