@@ -275,8 +275,154 @@
 
             // 13이상의 숫자를 사용하면 13에서 에러가 일어납니다. 하지만 콘솔에는 12부터 다시 카운트를 기록합니다. reject나
             // resolve가 함수를 멈추지는 않습니다. 이들은 그저 프라미스의 상태를 관리할 뿐입니다.
+
+            // 프라미스는 비동기적 작업이 성공 또는 실패하도록 확정하는, 매우 안전하고 잘 정의된 메커니즘을 제공하지만 현재는 진
+            // 행 상황을 전혀 알려주지 않습니다. 즉 프라미스는 완료되거나 파기 될 뿐, '50% 진행됐다'라는 개념은 아예 없는 겁니다.
         }
-        
+
+        /**
+         * 이벤트
+         * 
+         * 이벤트는 자바스크립트에서 자주 사용됩니다. 이벤트의 개념은 간단합니다. 이벤트가 일어나면 이벤트 발생을 담당하는 개체
+         * (emitter)에서 이벤트가 일어났음을 알립니다. 필요한 이벤트는 모두 주시(listen)할 수 있습니다. 어떻게 이벤트를 주시할
+         * 까요? 물론 콜백을 통해서입니다. 이벤트 시스템을 직접 만드는 것도 별로 어려운 일은 아니지만, 노드에는 이미 이벤트를
+         * 지원하는 모듈 EventEmitter가 내장돼 있습니다. 이 모듈을 써서 countdown 함수를 개선해 봅시다. EventEmitter는
+         * countdown 같은 함수와 같이 사용해도 되지만 원래는 클래스와 함께 사용하도록 설계됐습니다. 그러니 먼저 countdown
+         * 함수를 Coutdown 클래스로 바꿔 봅시다.
+         */
+        {
+            //const EventEmitter = require('events').EventEmitter;
+
+            class Countdown extends EventEmitter {
+                constructor(seconds, superstitions) {
+                    super();
+                    this.seconds = seconds;
+                    this.superstitions = !!superstitions;
+                }
+                go() {
+                    const countdown = this;
+                    return new Promise(function (resolve, reject) {
+                        for (let i = countdown.seconds; i >= 0; i--) {
+                            setTimeout(function () {
+                                if (countdown.superstitions && i == 13)
+                                    return reject(new Error('Oh my god'));
+                                countdown.emit('tick', i);
+                                if (i === 0) resolve();
+                            }, (countdown.seconds - i) * 1000);
+                        }
+                    });
+                }
+            }
+
+            // 중요한 부분은 countdown.emit('tick', i)입니다. 이부분에서 tick 이벤트를 발생기키고, 필요하다면 프로그램의 다른
+            // 부분에서 이 이벤트를 주시할 수 있습니다.(이벤트 이름은 원하는 대로 정해도 됩니다.) 개선한 카운트다운은 다음과 같이
+            // 사용할 수 있습니다.
+
+            const c = new Countdown(5);
+
+            c.on('tick', function (i) {
+                if (i > 0) console.log('...' + i + '...');
+            });
+
+            c.go()
+                .then(function () {
+                    console.log('GO!');
+                })
+                .catch(function (err) {
+                    console.error(err.message);
+                });
+
+            // EventEmitter의 on 메서드가 이벤트를 주시하는 부분입니다. 이 예제에서는 tick 이벤트 전체에 콜백을 등록했습니다.
+            // tick이 0이 아니면 출력한 다음 카운트다운을 시작하는 go를 호출합니다. 카운트다운이 끝나면 GO!를 출력합니다.
+            // 물론 GO!를 tick 이벤트 리스너 안에서 출력 할 수도 있지만, 이렇게 하는 편이 이벤트와 프라미스의 차이를 더 잘 드러낸
+            // 다고 생각합니다.
+
+            // 처음 만들었던 countdown 함수보다 훨씬 복잡한 것은 사실이지만, 그만큼 기능이 늘어났습니다. 이제 카운트다운을 어떻
+            // 게 활용할지 마음대로 바꿀 수 있고, 카운트다운이 끝났을 때 완료되는 프라미스도 생겼습니다.
+
+            // 하지만 여전히 할 일이 남아있습니다. Countdown 인스턴스가 13에 도달했을 때 프라미스를 파기 했는데도 카운트다운이
+            // 계속 진행되는 문제입니다.
+            {
+                const c = new Countdown(15, true);
+
+                c.on('tick', function (i) {
+                    if (i > 0) console.log('...' + i + '...');
+                });
+
+                c.go()
+                    .then(function () {
+                        console.log('GO!');
+                    })
+                    .catch(function (err) {
+                        console.error(err.message);
+                    });
+            }
+
+            // 여전히 모든 카운트가 출력되며 0이 될 때까지 진행합니다. 이 문제를 해결하기가 조금 어려운건 타임아웃이 이미 모두
+            // 만들어졌기 때문입니다. 이 문제를 해결하려면 더 진행할 수 없다는 사실을 아는 즉시 대기중인 타임아웃을 모두 취소하면
+            // 됩니다.
+            {
+                //const EventEmitter = require('events').EventEmitter;
+
+                class Countdown extends EventEmitter {
+                    constructor(seconds, superstitions) {
+                        super();
+                        this.seconds = seconds;
+                        this.superstitions = !!superstitions;
+                    }
+                    go() {
+                        const countdown = this;
+                        const timeoutIds = [];
+                        return new Promise(function (resolve, reject) {
+                            for (let i = countdown.seconds; i >= 0; i--) {
+                                timeoutIds.push(setTimeout(function () {
+                                    if (countdown.superstitions && i == 13) {
+                                        // 대기중인 타임아웃을 모두 취소합니다.
+                                        timeoutIds.forEach(clearTimeout);
+                                        return reject(new Error('Oh my god'));
+                                    }
+                                    countdown.emit('tick', i);
+                                    if (i === 0) resolve();
+                                }, (countdown.seconds - i) * 1000));
+                            }
+                        });
+                    }
+                }
+            }
+        }
+
+        /**
+         * 프라미스 체인
+         * 
+         * 프라미스에는 체인으로 연결할 수 있다는 장점이 있습니다. 즉, 프라미스가 완료되면 다른 프라미스를 반환하는 함수를 즉시
+         * 호출할 수 있습니다. launch 함수를 만들어 카운트다운이 끝나면 실행되게 해 봅시다.
+         */
+        {
+            function launch() {
+                return new Promise(function (resolve, reject) {
+                    console.log('Life off!');
+                    setTimeout(function () {
+                        resolve('In orbit!');
+                    }, 2 * 1000); // 2초만에 궤도에 도달하다니!
+                });
+            }
+
+            // 이 함수를 카운트다운에 쉽게 묶을 수 있습니다.
+            const c = new Countdown(5)
+                .on('tick', i => console.log(i + '...'));
+
+            c.go().then(launch)
+                .then(function (msg) {
+                    console.log(msg);
+                })
+                .catch(function (err) {
+                    console.error('Houston, we have a problem...');
+                });
+
+            // 프라미스 체인을 사용하면 모든 단계에서 에러를 캐치할 필요는 없습니다. 체인 어디에서든 에러가 생기면 체인 전체가
+            // 멈추고 catch 핸들러가 동작합니다. 카운트다운을 15초로 바꾸고 미신을 넣어서 실행해 보십시오. launch는 실행되
+            // 지 않습니다.
+        }
     }
 
 })();
