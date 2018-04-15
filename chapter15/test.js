@@ -60,4 +60,126 @@
         // 자바스크립트를 서버로 가져감에 따라 타임존을 더 일관되게 처리할 방법이 필요해졌습니다.
     }
 
+    /**
+     * Moment.js
+     * 
+     * 날짜 조작은 자주 사용하는 중요한 문제이므로 Moment.js 라이브러리를 소개하기로 했습니다.
+     * 
+     * Moment.js에는 타임존을 지원하는 버전과 지원하지 않는 버전 두 가지가 있습니다. 타임존 버전은 세계의 타임존 정보를 모두 담고 있어서 꽤 양이 많습니다.
+     * 다음 설명은 모두 타임존 버전을 기준으로 합니다.
+     */
+
+    /**
+     * 날짜 데이터 만들기
+     */
+    {
+        /**
+         * 1. 서버에서 날짜 생성하기
+         * 
+         * 서버에서 날짜를 생성할 때는 항상 UTC를 사용하거나 타임존을 명시하는 편이 좋습니다.
+         * UTC 날짜를 사용할 수 있는 환경이라면 Date 객체의 UTC 메서드를 사용하십시오.
+         */
+        {
+            /**
+             * NOTE_ Date.UTC는 Date의 매개변수를 똑같이 받지만, 새 Date 인스턴스를 반환하지 않고 해당 날짜의 숫자형 값을 반환합니다. 이 숫자를 Date
+             * 생성자에 넘기면 날짜 인스턴스를 얻을 수 있습니다.
+             */
+            {
+                const d = new Date(Date.UTC(2016, 4, 27)); // May 27, 2016 UTC
+            }
+
+            /**
+             * 특정 타임존에 있는 서버에서 날짜를 생성 할 때는 moment.tz를 써서 Date 인스턴스를 만들면 타임존을 손으로 변환할 필요가 없습니다.
+             */
+            {
+                const a = moment.tz("2013-11-18 11:55", "America/Toronto");
+                const b = moment.tz("May 12th 2014 8PM", "MMM Do YYYY hA", "America/Toronto");
+                const c = moment.tz(1403454068850, "America/Toronto");
+                console.log(a.format()); // 2013-11-18T11:55:00-05:00
+                console.log(b.format()); // 2014-05-12T20:00:00-04:00
+                console.log(c.format()); // 2014-06-22T12:21:08-04:00
+            }
+        }
+
+        /**
+         * 브라우저에서 날짜 생성하기
+         * 
+         * 일반적으로 자바스크립트의 기본 동작은 브라우저에서 사용하기에 알맞습니다. 브라우저는 운영체제를 통해 타임존 정보를 알 수 있고, 사용자는
+         * 일반적으로 그 지역의 시간을 선호합니다. 앱에서 다른 타임존의 날짜를 처리해야 한다면 Moment.js를 이용해 타임존을 변환하십시오.
+         */
+    }
+
+    /**
+     * 날짜 데이터 전송하기
+     * 
+     * 서버에서 브라우저로 날짜를 전송하거나, 반대로 브라우저에서 서버로  날짜를 전송할 때는 조금 복잡할 수 있습니다. 서버와 브라우저가 다른 타임
+     * 존에 있더라도 사용자는 자신의 타임존을 기준으로 날짜를 보고 싶어 할 겁니다. 다행히 자바스크립트의 Date 인스턴스는 날짜를 저장할 때 UTC
+     * 를 기준으로 유닉스 타임스탬프를 저장하므로, Date 객체를 그냥 전송해도 일반적으로 안전합니다.
+     * 
+     * 자바스크립트에서 날짜를 전송하는 가장 확실한 방법은 JSON을 사용하는 겁니다. 날짜는 JSON에서 1:1 대칭이 되게끔 파싱할 수 없으므로 JSO
+     * N 명세에는 날짜에 대한 데이터 타입을 정의하지 않았습니다.
+     */
+    {
+        const before = { d: new Date() };
+        console.log(before.d instanceof Date); // true
+        const json = JSON.stringify(before);
+        const after = JSON.parse(json);
+        console.log(after.d instanceof Date); // false
+        console.log(typeof after.d); // "string"
+
+        // 즉, JSON으로 바로 날짜를 다룰 수는 없지만, 전송된 문자열에서 날짜를 '복구'하는 것은 가능합니다.
+        after.d = new Date(after.d);
+        console.log(after.d instanceof Date); // true
+
+        /**
+         * 원래 날짜가 어느 타임존에 있었든, 일단 JSON으로 인코드된 날짜는 UTC입니다. 그리고 JSON으로 인코드된 문자열을 Date 생성자에 넘
+         * 겨서 얻은 날짜는 사용자의 타임존을 기준으로 표시됩니다.
+         * 
+         * 문자열로 인코드하지 않고 valueof() 메서드로 얻은 숫자를 그냥 전송해도 됩니다.
+         */
+        {
+            const before = { d: new Date().valueOf() };
+            console.log(typeof before.d); // "number"
+            const json = JSON.stringify(before);
+            const after = JSON.parse(json);
+            console.log(typeof after.d); // "number"
+            const d = new Date(after.d);
+        }
+
+        /**
+         * NOTE_ 자바스크립트에서는 JSON으로 인코드된 날짜 문자열을 일관되게 처리하지만, 다른 언어나 운영체제에서 제공하는 JSON 라이브러리
+         * 는 그렇지 않습니다. 특히, .NET JSON 직렬화기는 JSON으로 인코드된 날짜 객체를 자신만의 형식으로 감싸 버립니다. 따라서 자바스크립트
+         * 가 아닌 다른 시스템과 날짜 데이터를 주고 받을 때는 그 시스템에서 날짜를 어떻게 직렬화하는지 알아둬야 합니다. 이런 상황에는 유닉스 타임스
+         * 탬프를 주고받는 편이 더 안전합니다. 하지만 유닉스 타임스탬프를 주고받을 때도 한 가지 조심할 것이 있습니다. 숫자형 값을 밀리초가 아니라
+         * 초 기준으로 해석하는 라이브러리도 많습니다.
+         */
+    }
+
+    /**
+     * 날짜 비교
+     * 
+     * 날짜 A와 날짜 B중 어느 쪽이 더 앞인가 하는 단순한 날짜 비교는 자바스크립트에 내장된 비교 연산자를 통해 할 수 있습니다. Date 인스턴스는 날
+     * 짜를 숫자로 저장하므로, 숫자에 쓸 수 있는 비교 연산자를 그대로 쓰면 됩니다.
+     */
+    {
+        const d1 = new Date(1996, 2, 1);
+        const d2 = new Date(2009, 4, 27);
+        console.log(d1 > d2); // false
+        console.log(d1 < d2); // true
+    }
+
+    /**
+     * 날짜 연산
+     * 
+     * 날짜는 숫자이므로 날짜에서 날짜를 빼면 몇 밀리초가 지났는지 알 수 있습니다.
+     */
+    {
+        const d1 = new Date(1996, 2, 1);
+        const d2 = new Date(2009, 4, 27);
+        const msDiff = d2 - d1;
+        const daysDiff = msDiff / 1000 / 60 / 60 / 24;
+        console.log(msDiff); // 417744000000 ms
+        console.log(daysDiff); // 4835 days
+    }
+
 })();
