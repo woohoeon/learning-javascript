@@ -228,3 +228,49 @@ Example of learning javascript book
 * 날짜 비교
 
 * 날짜 연산
+
+## Chapter16
+
+#### [Math](https://github.com/woohoeon/learning-javascript/blob/master/chapter16/test.js)
+
+* 숫자형식
+
+	* 고정 소수점
+
+	* 지수 표기법
+
+	* 고정 전체 자리수
+
+	* 다른 진수
+
+	* 고급 숫자 형식
+
+* 상수
+
+* 대수 함수
+
+	* 거듭제곱
+
+	* 로그함수
+
+	* 기타함수
+
+	* 의사 난수 생성
+
+## Chapter17
+
+#### [정규표현식](https://github.com/woohoeon/learning-javascript/blob/master/chapter17/test.js)
+
+* 부분 문자열 검색과 대체
+
+* 정규식 만들기
+
+* 정규식 검색
+
+* 정규식을 사용한 문자열 교체
+
+* 입력 소비
+
+* 대체
+
+* HTML 찾기
